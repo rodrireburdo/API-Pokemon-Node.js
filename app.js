@@ -1,20 +1,38 @@
 import express from "express";
 import passport from "passport";
 import auth from "./auth.js";
-import usersController from "./controllers/users.js";
 import jwt from "jsonwebtoken";
+import bodyParser from "body-parser";
 
-auth(passport);
+
+import usersController from "./controllers/users.js";
+usersController.registerUser("rodri", "4321");
+usersController.registerUser("bettatech", "1234");
 
 const app = express();
 const port = 3000;
 
-app.use(express.json()); // Middleware para procesar JSON
+auth(passport);
+app.use(express.json());
 app.use(passport.initialize());
+app.use(bodyParser.json());
 
 app.post('/login', (req, res) => {
+    if (!req.body) {
+        return res.status(400).json({ message: 'Missing datad' });
+    } else if (!req.body.user || !req.body.password) {
+        return res.status(400).json({ message: 'Missing data' });
+
+    }
     // Comprobamos credenciales
-    const { username, password } = req.body;
+    usersController.checkUserCredentials(req.body.user, req.body.password, (err, result) => {
+        if (err || !result) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign({ userId: result }, 'secretPassword');
+        res.status(200).json({ token: token });
+    })
 
     if (!username || !password) {
         return res.status(400).json({ message: 'El username y password son obligatorios.' });
