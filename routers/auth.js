@@ -1,6 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import usersController from "../controllers/users.js"; // Corrige la ruta según tu estructura.
+import usersController from "../controllers/users.js";
 const router = express.Router();
 
 usersController.registerUser("rodri", "4321");
