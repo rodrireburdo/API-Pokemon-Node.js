@@ -46,7 +46,7 @@ describe('Suite de pruebas auth', () => {
         request(app)
             .post('/auth/login')
             .set('content-type', 'application/json')
-            .send({ user: 'mastermind', password: '4321' })
+            .send({ user: 'rodri', password: '4321' })
             .end((err, res) => {
                 //Expect valid login
                 assert.equal(res.statusCode, 200);
