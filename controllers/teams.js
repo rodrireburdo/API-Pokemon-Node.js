@@ -11,6 +11,12 @@ const addPokemon = (userId, pokemon) => {
     teamsDatabase[userId].push(pokemon);
 }
 
+const deletePokemonAt = (userId, index) => {
+    if (teamsDatabase[userId][index]) {
+        teamsDatabase[userId].splice(index, 1);
+    }
+}
+
 const setTeam = (userId, team) => {
     teamsDatabase[userId] = team;
 }
@@ -18,6 +24,7 @@ const setTeam = (userId, team) => {
 export default {
     bootstrapTeam, 
     addPokemon, 
+    deletePokemonAt,
     setTeam,
     getTeamOfUser
 };

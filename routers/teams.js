@@ -28,7 +28,8 @@ router.route('/')
         });
 
 router.route('/pokemons')
-    .post(passport.authenticate('jwt', { session: false }),
+    .post(
+        passport.authenticate('jwt', { session: false }),
         (req, res) => {
             console.log("llamada a pokeapi");
             let pokemonName = req.body.name;
@@ -52,8 +53,11 @@ router.route('/pokemons')
         });
 
 router.route('/pokemons/:pokeid')
-    .delete((req, res) => {
-        res.status(200).send("Hello world!");
+    .delete(
+        passport.authenticate('jwt', { session: false }),
+        (req, res) => {
+            teamsController.deletePokemonAt(req.user.userId, req.params.pokeid);
+        res.status(200).send();
     });
 
 export default router;
