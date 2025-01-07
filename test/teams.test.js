@@ -37,4 +37,33 @@ describe('Suite de pruebas teams', () => {
                     });
             });
     });
+
+    it('should return the podex number', (done) => {
+        let pokemonName = 'Bulbasaur';
+        request(app)
+            .post('/auth/login')
+            .set('content-type', 'application/json')
+            .send({ user: 'bettatech', password: '1234' })
+            .end((err, res) => {
+                let token = res.body.token;
+                assert.equal(res.statusCode, 200);
+                request(app)
+                    .post('/teams/pokemons')
+                    .send({ name: pokemonName })
+                    .set('Authorization', `JWT ${token}`)
+                    .end((err, res) => {
+                        request(app)
+                            .get('/teams')
+                            .set('Authorization', `JWT ${token}`)
+                            .end((err, res) => {
+                                assert.equal(res.statusCode, 200);
+                                assert.equal(res.body.trainer, 'bettatech');
+                                assert.equal(res.body.team.length, 1);
+                                assert.equal(res.body.team[0].name, pokemonName);
+                                assert.equal(res.body.team[0].pokedexNumber, 1);
+                                done();
+                            })
+                    });
+            });
+    });
 });

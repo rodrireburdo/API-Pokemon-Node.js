@@ -1,6 +1,7 @@
 import express from "express";
 import passport from "passport";
 import auth from "../auth.js";
+import axios from "axios";
 import teamsController from "../controllers/teams.js";
 import usersController from "../controllers/users.js";
 
@@ -22,14 +23,33 @@ router.route('/')
     .put(
         passport.authenticate('jwt', { session: false }),
         (req, res) => {
-        teamsController.setTeam(req.user.userId, req.body.team);
-        res.status(200).send();
-    });
+            teamsController.setTeam(req.user.userId, req.body.team);
+            res.status(200).send();
+        });
 
 router.route('/pokemons')
-    .post((req, res) => {
-        res.status(200).send("Hello world!");
-    });
+    .post(passport.authenticate('jwt', { session: false }),
+        (req, res) => {
+            console.log("llamada a pokeapi");
+            let pokemonName = req.body.name;
+            axios.get('https://pokeapi.co/api/v2/pokemon/' + pokemonName.toLowerCase())
+                .then(function (response) {
+                    let pokemon = {
+                        name: pokemonName,
+                        pokedexNumber: response.data.id
+                    }
+                    teamsController.addPokemon(req.user.userId, pokemon);
+
+                    res.status(201).json(pokemon);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    res.status(400).json({ message: error });
+                })
+                .then(function () {
+
+                });
+        });
 
 router.route('/pokemons/:pokeid')
     .delete((req, res) => {
