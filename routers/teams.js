@@ -1,7 +1,11 @@
 import express from "express";
 import passport from "passport";
 import auth from "../auth.js";
+import teamsController from "../controllers/teams.js";
+import usersController from "../controllers/users.js";
+
 const router = express.Router();
+const getUser = usersController.getUser;
 
 auth(passport);
 
@@ -9,11 +13,15 @@ router.route('/')
     .get(
         passport.authenticate('jwt', { session: false }),
         (req, res, next) => {
-            res.status(200).send("Hello world!");
+            let user = getUser(req.user.userId);
+            res.status(200).json({
+                trainer: user.userName,
+                team: teamsController.getTeamOfUser(req.user.userId)
+            });
         }
     )
     .put((req, res) => {
-        res.status(200).send("Hello world!");
+        teamsController.setTeam(req.body.user, req.body.team);
     });
 
 router.route('/pokemons')
@@ -25,5 +33,5 @@ router.route('/pokemons/:pokeid')
     .delete((req, res) => {
         res.status(200).send("Hello world!");
     });
-    
+
 export default router;

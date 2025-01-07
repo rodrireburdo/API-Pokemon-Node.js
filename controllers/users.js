@@ -1,28 +1,34 @@
-import { v4 as uuidv4 } from 'uuid'; // Importación correcta de `uuid`
-import crypto from '../crypto.js'; // Importa tu módulo `crypto`
+import { v4 as uuidv4 } from 'uuid';
+import crypto from '../crypto.js'; 
+import teams from './teams.js'; 
 
 const userDatabase = {};
 
-// Función para registrar un nuevo usuario
 const registerUser = (userName, password) => {
     let hashedPwd = crypto.hashPasswordSync(password);
-
-    userDatabase[uuidv4()] = {
+    let userId = uuidv4();
+    userDatabase[userId] = {
         userName: userName,
         password: hashedPwd
     }
+    teams.bootstrapTeam(userId);
 };
+
+const getUser = (userId) => {
+    return userDatabase[userId];
+}
 
 const getUserIdFromUserName = (userName) => {
     for (let user in userDatabase) {
         if (userDatabase[user].userName === userName) {
-            return userDatabase[user];
+            let userData = userDatabase[user];
+            userData.userId = user;
+            return userData;
         }
     }
 }
-
 const checkUserCredentials = (userName, password, done) => {
-    console.log('chacking user credentials');
+    console.log('Checking user credentials');
 
     let user = getUserIdFromUserName(userName);
 
@@ -36,5 +42,7 @@ const checkUserCredentials = (userName, password, done) => {
 
 export default {
     registerUser,
-    checkUserCredentials
+    getUser,
+    checkUserCredentials,
+    getUserIdFromUserName,
 };
