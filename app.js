@@ -1,7 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
-import authRoutes from "./routers/auth.js";
-import teamsRoutes from "./routers/teams.js";
+
+// RUTAS
+import authRoutes from "./auth/router-auth.js";
+import teamsRoutes from "./teams/router-teams.js";
 
 const app = express();
 app.use(bodyParser.json());

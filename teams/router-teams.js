@@ -1,9 +1,9 @@
 import express from "express";
 import passport from "passport";
-import auth from "../auth.js";
+import auth from "../tools/auth.js";
 import axios from "axios";
-import teamsController from "../controllers/teams.js";
-import usersController from "../controllers/users.js";
+import teamsController from "./controller-teams.js";
+import usersController from "../auth/controller-users.js";
 
 const router = express.Router();
 const getUser = usersController.getUser;
@@ -31,7 +31,6 @@ router.route('/pokemons')
     .post(
         passport.authenticate('jwt', { session: false }),
         (req, res) => {
-            console.log("llamada a pokeapi");
             let pokemonName = req.body.name;
             axios.get('https://pokeapi.co/api/v2/pokemon/' + pokemonName.toLowerCase())
                 .then(function (response) {

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import crypto from '../crypto.js'; 
-import teams from './teams.js'; 
+import crypto from '../tools/crypto.js'; 
+import teams from '../teams/controller-teams.js'; 
 
 const userDatabase = {};
 
