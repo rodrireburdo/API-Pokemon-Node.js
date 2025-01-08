@@ -1,6 +1,4 @@
 import express from "express";
-import passport from "passport";
-import auth from "../tools/auth.js";
 import axios from "axios";
 import teamsController from "./controller-teams.js";
 import usersController from "../auth/controller-users.js";
@@ -8,12 +6,9 @@ import usersController from "../auth/controller-users.js";
 const router = express.Router();
 const getUser = usersController.getUser;
 
-auth(passport);
-
 router.route('/')
     .get(
-        passport.authenticate('jwt', { session: false }),
-        (req, res, next) => {
+        (req, res) => {
             let user = getUser(req.user.userId);
             res.status(200).json({
                 trainer: user.userName,
@@ -21,7 +16,6 @@ router.route('/')
             });
         })
     .put(
-        passport.authenticate('jwt', { session: false }),
         (req, res) => {
             teamsController.setTeam(req.user.userId, req.body.team);
             res.status(200).send();
@@ -29,7 +23,6 @@ router.route('/')
 
 router.route('/pokemons')
     .post(
-        passport.authenticate('jwt', { session: false }),
         (req, res) => {
             let pokemonName = req.body.name;
             axios.get('https://pokeapi.co/api/v2/pokemon/' + pokemonName.toLowerCase())
@@ -53,7 +46,6 @@ router.route('/pokemons')
 
 router.route('/pokemons/:pokeid')
     .delete(
-        passport.authenticate('jwt', { session: false }),
         (req, res) => {
             teamsController.deletePokemonAt(req.user.userId, req.params.pokeid);
         res.status(200).send();

@@ -1,15 +1,14 @@
 import express from "express";
-import bodyParser from "body-parser";
-
+import middlewares from "./middlewares.js"
 // RUTAS
 import authRoutes from "./auth/router-auth.js";
 import teamsRoutes from "./teams/router-teams.js";
 
 const app = express();
-app.use(bodyParser.json());
 
 const port = 3000;
 
+middlewares.setupMiddlewares(app);
 app.get('/', (req, res) => {
     res.status(200).send("Hello world!");
 });
