@@ -43,8 +43,8 @@ const getUserIdFromUserName = (userName) => {
     });
 }
 const checkUserCredentials = (userName, password) => {
-    return new Promise(async(resolve, reject) => {
-        let user = getUserIdFromUserName(userName);
+    return new Promise(async (resolve, reject) => {
+        let user = await getUserIdFromUserName(userName);
         if (user) {
             crypto.comparePassword(password, user.password, (err, result) => {
                 if (err) {

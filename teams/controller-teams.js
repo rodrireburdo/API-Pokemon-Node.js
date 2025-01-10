@@ -18,7 +18,7 @@ const bootstrapTeam = (userId) => {
 
 const getTeamOfUser = (userId) => {
     return new Promise((resolve, reject) => {
-        resolve(teamsDatabase[userId])
+        resolve(teamsDatabase[userId]);
     })
 }
 

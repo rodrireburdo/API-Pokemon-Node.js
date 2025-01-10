@@ -8,16 +8,14 @@ import teamsController from "../teams/controller-teams.js";
 
 use(superagent());
 
-
 beforeEach(async () => {
     await usersController.registerUser('rodri', '4321');
     await usersController.registerUser('bettatech', '1234');
 })
 
 afterEach(async () => {
-    await usersController.cleanUpUsers();
     await teamsController.cleanUpTeam();
-});
+})
 
 describe('Suite de pruebas teams', () => {
     it('should return the team of the given user', (done) => {
@@ -80,18 +78,19 @@ describe('Suite de pruebas teams', () => {
             });
     });
 
-    it('should return delete the pokemon', (done) => {
-        let team = [{ name: 'Charizard' }, { name: 'Blastoise' }, { name: 'Pikachu' }];
+    it('should return the pokedex number', (done) => {
+        let team = [{name: 'Charizard'}, {name: 'Blastoise'}, {name: 'Pikachu'}];
         request(app)
             .post('/auth/login')
             .set('content-type', 'application/json')
-            .send({ user: 'rodri', password: '4321' })
+            .send({user: 'rodri', password: '4321'})
             .end((err, res) => {
                 let token = res.body.token;
+                //Expect valid login
                 assert.equal(res.statusCode, 200);
                 request(app)
                     .put('/teams')
-                    .send({ team: team })
+                    .send({team: team})
                     .set('Authorization', `JWT ${token}`)
                     .end((err, res) => {
                         request(app)
@@ -106,8 +105,8 @@ describe('Suite de pruebas teams', () => {
                                         assert.equal(res.body.trainer, 'rodri');
                                         assert.equal(res.body.team.length, team.length - 1);
                                         done();
-                                    })
-                            })
+                                    });
+                            });
                     });
             });
     });
@@ -123,7 +122,7 @@ describe('Suite de pruebas teams', () => {
         request(app)
             .post('/auth/login')
             .set('content-type', 'application/json')
-            .send({user: 'mastermind', password: '4321'})
+            .send({user: 'rodri', password: '4321'})
             .end((err, res) => {
                 let token = res.body.token;
                 //Expect valid login
@@ -135,7 +134,7 @@ describe('Suite de pruebas teams', () => {
                     .end((err, res) => {
                         request(app)
                             .post('/teams/pokemons')
-                            .send({name: 'Vibrava'})
+                            .send({name: 'vibrava'})
                             .set('Authorization', `JWT ${token}`)
                             .end((err, res) => {
                                 assert.equal(res.statusCode, 400);
