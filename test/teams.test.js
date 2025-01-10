@@ -3,8 +3,21 @@ import { app } from '../app.js';
 import { use } from 'chai';
 import superagent from 'chai-superagent';
 import request from 'supertest';
+import usersController from "../auth/controller-users.js";
+import teamsController from "../teams/controller-teams.js";
 
 use(superagent());
+
+
+beforeEach(async () => {
+    await usersController.registerUser('rodri', '4321');
+    await usersController.registerUser('bettatech', '1234');
+})
+
+afterEach(async () => {
+    await usersController.cleanUpUsers();
+    await teamsController.cleanUpTeam();
+});
 
 describe('Suite de pruebas teams', () => {
     it('should return the team of the given user', (done) => {
@@ -95,6 +108,39 @@ describe('Suite de pruebas teams', () => {
                                         done();
                                     })
                             })
+                    });
+            });
+    });
+
+    it('should not be able to add pokemon if you already have 6', (done) => {
+        let team = [
+            {name: 'Charizard'}, 
+            {name: 'Blastoise'}, 
+            {name: 'Pikachu'},
+            {name: 'Charizard'}, 
+            {name: 'Blastoise'}, 
+            {name: 'Pikachu'}];
+        request(app)
+            .post('/auth/login')
+            .set('content-type', 'application/json')
+            .send({user: 'mastermind', password: '4321'})
+            .end((err, res) => {
+                let token = res.body.token;
+                //Expect valid login
+                assert.equal(res.statusCode, 200);
+                request(app)
+                    .put('/teams')
+                    .send({team: team})
+                    .set('Authorization', `JWT ${token}`)
+                    .end((err, res) => {
+                        request(app)
+                            .post('/teams/pokemons')
+                            .send({name: 'Vibrava'})
+                            .set('Authorization', `JWT ${token}`)
+                            .end((err, res) => {
+                                assert.equal(res.statusCode, 400);
+                                done();
+                            });
                     });
             });
     });

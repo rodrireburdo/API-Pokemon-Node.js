@@ -4,10 +4,20 @@ import { use } from 'chai';
 import superagent from 'chai-superagent';
 import request from 'supertest';
 
+import usersController from "../auth/controller-users.js";
+import teamsController from "../teams/controller-teams.js";
+
 use(superagent());
 
-//Test 1: Verifica que si no se proporciona un JWT, la respuesta del servidor sea 401 Unauthorized.
-//Test 2: Verifica que si se proporciona un JWT válido, la respuesta del servidor sea 200 OK.
+beforeEach(async () => {
+    await usersController.registerUser('rodri', '4321');
+    await usersController.registerUser('bettatech', '1234');
+})
+
+afterEach(async () => {
+    await usersController.cleanUpUsers();
+    await teamsController.cleanUpTeam();
+});
 
 describe('Suite de pruebas auth', () => {
     it('should return 401 when no jwt token available', (done) => {
