@@ -1,5 +1,6 @@
 import express from "express";
 import middlewares from "./middlewares.js"
+import './database.js'
 // RUTAS
 import authRoutes from "./auth/router-auth.js";
 import teamsRoutes from "./teams/router-teams.js";
