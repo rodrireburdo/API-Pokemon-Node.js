@@ -1,12 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
+import mongoose from 'mongoose';
 import crypto from '../tools/crypto.js';
 import teams from '../teams/controller-teams.js';
+import toFile from "../tools/to.js"
 
-let userDatabase = {};
+const to = toFile.to;
+
+
+const UserModel = mongoose.model('UserModel', 
+    { userName: String, password: String, userId: String });
 
 const cleanUpUsers = () => {
-    return new Promise((resolve, reject) => {
-        userDatabase = {};
+    return new Promise(async (resolve, reject) => {
+        await UserModel.deleteMany({}).exec();
         resolve();
     })
 }
@@ -14,38 +20,43 @@ const cleanUpUsers = () => {
 const registerUser = (userName, password) => {
     return new Promise(async (resolve, reject) => {
         let hashedPwd = crypto.hashPasswordSync(password);
+        // Guardar en la base de datos nuestro usuario
         let userId = uuidv4();
-        userDatabase[userId] = {
+        let newUser = new UserModel({
+            userId: userId,
             userName: userName,
             password: hashedPwd
-        }
+        });
+        await newUser.save();
         await teams.bootstrapTeam(userId);
         resolve();
     });
 }
 
 const getUser = (userId) => {
-    return new Promise((resolve, reject) => {
-        resolve(userDatabase[userId]);
+    return new Promise(async (resolve, reject) => {
+        let [err, result] = await to(UserModel.findOne({userId: userId}).exec());
+        if (err) {
+            return reject(err);
+        }
+        resolve(result);
     });
 }
 
 const getUserIdFromUserName = (userName) => {
-    return new Promise((resolve, reject) => {
-        for (let user in userDatabase) {
-            if (userDatabase[user].userName === userName) {
-                let userData = userDatabase[user];
-                userData.userId = user;
-                return resolve(userData);
+        return new Promise(async (resolve, reject) => {
+            let [err, result] = await to(UserModel.findOne({userName: userName}).exec());
+            if (err) {
+                return reject(err);
             }
-        }
-        reject('No user found');
-    });
+            resolve(result);
+        });
 }
+
 const checkUserCredentials = (userName, password) => {
     return new Promise(async (resolve, reject) => {
-        let user = await getUserIdFromUserName(userName);
-        if (user) {
+        let [err, user] = await to(getUserIdFromUserName(userName));
+        if (!err || user) {
             crypto.comparePassword(password, user.password, (err, result) => {
                 if (err) {
                     reject(err);
@@ -54,9 +65,9 @@ const checkUserCredentials = (userName, password) => {
                 }
             });
         } else {
-            reject('missing user');
+            reject(err);
         }
-    })
+    });
 }
 
 export default {

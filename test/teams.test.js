@@ -3,6 +3,7 @@ import { app } from '../app.js';
 import { use } from 'chai';
 import superagent from 'chai-superagent';
 import request from 'supertest';
+
 import usersController from "../auth/controller-users.js";
 import teamsController from "../teams/controller-teams.js";
 
@@ -14,6 +15,7 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
+    await usersController.cleanUpUsers();
     await teamsController.cleanUpTeam();
 })
 

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 let password = 'admin';
 let databaseName = 'db';
 
-let uri = `mongodb+srv://admin:${password}@cluster0.elb6m.mongodb.net/${databaseName}?retryWrites=true&w=majority`;
+let uri = `base de datos de mongo`;
 
 mongoose.connect(uri)
     .then(() => console.log('Conexión exitosa a MongoDB Atlas'))
